@@ -1,9 +1,11 @@
-from flask import Flask, redirect, url_for, render_template, request
-import utils.database as db
+from flask import Flask, redirect, url_for, render_template, request, session
 import utils.account as account
+import utils.database as db
+import os
 
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 config = db.readconfig("config.yml")
 #print(config["DB_HOSTNAME"])
@@ -13,8 +15,7 @@ db.create_table(connection=conn)
 
 @app.route("/")
 def home_page():
-    args = request.args.to_dict()
-    return render_template("index.html", content=args.get('msg'))
+    return render_template("index.html")
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -22,7 +23,15 @@ def login_page():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        return redirect(url_for("home_page"))
+        user = account.login(connexion=conn, email=email, passwd=password)
+        if user != "Error":
+            session["uuid"] = user[1]
+            session["username"] = user[2]
+            session["email"] = user[3]
+            session["stockage"] = user[5]
+            return redirect(url_for("user_page"))
+        else:
+            return redirect(url_for("home_page"))
     else:
         return render_template("login.html")
 
@@ -35,10 +44,23 @@ def register_page():
         cemail =  request.form["cemail"]
         password = request.form["password"]
         cpassword = request.form["cpassword"]
-        register = account.register(username=username, email=email, conf_email=cemail, passwd=password, conf_passwd=cpassword)
-        return redirect(url_for("home_page", msg=register))
+        register = account.register(connexion=conn, username=username, email=email, conf_email=cemail, passwd=password, conf_passwd=cpassword)
+        return redirect(url_for("home_page"))
     else:
         return render_template("register.html")
+
+
+@app.route("/user")
+def user_page():
+    if 'uuid' in session:
+        username = session['username']
+        email = session['email']
+        uuid = session['uuid']
+        space = session['stockage']
+        return render_template("user.html", username=username, email=email, uuid=uuid, space=space)
+    else:
+        return redirect(url_for("login_page"))
+
 
 if __name__ == '__main__':
     app.run()
