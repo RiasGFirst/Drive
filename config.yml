@@ -1,0 +1,5 @@
+DB_HOSTNAME: test.riascloud.fr
+DB_PORT: 3306
+DB_NAME: drivetest
+DB_USERNAME: driveadmin
+DB_PASS: Dr!veUser123
