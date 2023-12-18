@@ -6,6 +6,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.config["IMAGE_UPLOADS"] = "/home/rias/Bureau/RiasCloud/Drive/drivefile"
 
 config = db.readconfig("config.yml")
 #print(config["DB_HOSTNAME"])
@@ -45,18 +46,28 @@ def register_page():
         password = request.form["password"]
         cpassword = request.form["cpassword"]
         register = account.register(connexion=conn, username=username, email=email, conf_email=cemail, passwd=password, conf_passwd=cpassword)
+        if register == "User added!":
+            usr = db.get_user(connection=conn, email=email)
+            os.mkdir(path=f"{app.config['IMAGE_UPLOADS']}/{usr[1]}")
         return redirect(url_for("home_page"))
     else:
         return render_template("register.html")
 
 
-@app.route("/user")
+@app.route("/user", methods=["POST", "GET"])
 def user_page():
     if 'uuid' in session:
         username = session['username']
         email = session['email']
         uuid = session['uuid']
         space = session['stockage']
+
+        if request.method == "POST":
+            if request.files:
+                image = request.files["image"]
+                image.save(os.path.join(f"{app.config['IMAGE_UPLOADS']}/{uuid}", image.filename))
+                print("Img save")
+                return redirect(request.url)
         return render_template("user.html", username=username, email=email, uuid=uuid, space=space)
     else:
         return redirect(url_for("login_page"))
