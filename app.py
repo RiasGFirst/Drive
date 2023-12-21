@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, session
+from flask import Flask, redirect, url_for, render_template, request, session, send_from_directory
 import utils.account as account
 import utils.database as db
 import os
@@ -6,10 +6,10 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-app.config["IMAGE_UPLOADS"] = "/home/rias/Bureau/RiasCloud/Drive/drivefile"
+app.config["FOLDER_UPLOADS"] = "/home/rias/Bureau/RiasCloud/Drive/drivefile"
 
 config = db.readconfig("config.yml")
-#print(config["DB_HOSTNAME"])
+print(config["DB_HOSTNAME"])
 conn = db.connect_db(host=config["DB_HOSTNAME"], user=config["DB_USERNAME"], password=config["DB_PASS"], dbname=config["DB_NAME"])
 db.create_table(connection=conn)
 
@@ -30,6 +30,7 @@ def login_page():
             session["username"] = user[2]
             session["email"] = user[3]
             session["stockage"] = user[5]
+            session["user_folder"] = f"{app.config['FOLDER_UPLOADS']}/{user[1]}"
             return redirect(url_for("user_page"))
         else:
             return redirect(url_for("home_page"))
@@ -61,16 +62,34 @@ def user_page():
         email = session['email']
         uuid = session['uuid']
         space = session['stockage']
+        user_folder = session["user_folder"]
 
         if request.method == "POST":
             if request.files:
                 image = request.files["image"]
-                image.save(os.path.join(f"{app.config['IMAGE_UPLOADS']}/{uuid}", image.filename))
+                image.save(os.path.join(user_folder, image.filename))
                 print("Img save")
                 return redirect(request.url)
-        return render_template("user.html", username=username, email=email, uuid=uuid, space=space)
+        # Get the list of files and directories
+        content = os.listdir(user_folder)
+
+        # Separate files and directories
+        files = [item for item in content if os.path.isfile(os.path.join(user_folder, item))]
+        directories = [item for item in content if os.path.isdir(os.path.join(user_folder, item))]
+        return render_template("user.html",
+                               username=username,
+                               email=email,
+                               uuid=uuid,
+                               space=space,
+                               files=files,
+                               directories=directories)
     else:
         return redirect(url_for("login_page"))
+
+
+@app.route('/images/<path:directory>/<path:filename>')
+def custom_static(directory, filename):
+    return send_from_directory(f'/home/rias/Bureau/RiasCloud/Drive/drivefile/{directory}', filename)
 
 
 if __name__ == '__main__':

@@ -6,6 +6,37 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Main Page</title>
+    <style>
+        /* Vos styles CSS ici */
+        #previewOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #previewImage {
+            max-width: 80%;
+            max-height: 80%;
+            border: 5px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .closePreview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="aside">
@@ -25,10 +56,35 @@
                 <label class="custom-file-label" for="image">Select Image...</label>
             </div>
         </div>
-
     </form>
+    <div class="item-folder">
+        <ul>
+            {% for file in files %}
+                <li>{{ file }}</li>
+                <a href="#" onclick="showPreview('{{ uuid }}', '{{ file }}')">Preview</a>
+            {% endfor %}
+        </ul>
+        <ul>
+            {% for directory in directories %}
+                <li>{{ directory }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 
+    <div id="previewOverlay">
+        <span class="closePreview" onclick="closePreview()">&times;</span>
+        <img id="previewImage" src="" alt="Preview de l'image">
+    </div>
 
+    <script>
+        function showPreview(uuid, fileName) {
+            document.getElementById('previewImage').src = '/images/' + encodeURIComponent(uuid) + '/' + encodeURIComponent(fileName);
+            document.getElementById('previewOverlay').style.display = 'flex';
+        }
 
+        function closePreview() {
+            document.getElementById('previewOverlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
