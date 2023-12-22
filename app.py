@@ -14,6 +14,24 @@ conn = db.connect_db(host=config["DB_HOSTNAME"], user=config["DB_USERNAME"], pas
 db.create_table(connection=conn)
 
 
+def user_folder_size(folder_path):
+    total_size = 0
+
+    for dirpath, dirnames, filenames in os.walk(folder_path):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            total_size += os.path.getsize(filepath)
+
+    # Convert bytes to megabytes (MB) or gigabytes (GB)
+    mb_size = total_size / (1024 ** 2)  # 1 MB = 1024^2 bytes
+    gb_size = total_size / (1024 ** 3)  # 1 GB = 1024^3 bytes
+
+    if gb_size >= 1:
+        return f"{gb_size:.2f} GB"
+    else:
+        return f"{mb_size:.2f} MB"
+
+
 @app.route("/")
 def home_page():
     return render_template("index.html")
@@ -82,7 +100,8 @@ def user_page():
                                uuid=uuid,
                                space=space,
                                files=files,
-                               directories=directories)
+                               directories=directories,
+                               used_space=user_folder_size(user_folder))
     else:
         return redirect(url_for("login_page"))
 
@@ -93,4 +112,4 @@ def custom_static(directory, filename):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

@@ -36,6 +36,7 @@
             font-size: 20px;
             cursor: pointer;
         }
+
     </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
         <p>username: {{username}}</p>
         <p>email: {{email}}</p>
         <p>uuid: {{uuid}}</p>
-        <p>space: {{space}} GB</p>
+        <p>space: {{used_space}}/{{space}} GB</p>
     </div>
     <form action="/user" method="POST" enctype="multipart/form-data">
 
@@ -53,15 +54,14 @@
             <div class="custom-file">
                 <input type="file" class="custom-file-input" name="image" id="image">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <label class="custom-file-label" for="image">Select Image...</label>
+                <label class="custom-file-label" for="image"></label>
             </div>
         </div>
     </form>
     <div class="item-folder">
         <ul>
             {% for file in files %}
-                <li>{{ file }}</li>
-                <a href="#" onclick="showPreview('{{ uuid }}', '{{ file }}')">Preview</a>
+                <a href="#" onclick="showPreview('{{ uuid }}', '{{ file }}')">{{ file }}</a>
             {% endfor %}
         </ul>
         <ul>
@@ -72,13 +72,13 @@
     </div>
 
     <div id="previewOverlay">
-        <span class="closePreview" onclick="closePreview()">&times;</span>
+        <span class="closePreview" onclick="closePreview()">&times;Close</span>
         <img id="previewImage" src="" alt="Preview de l'image">
     </div>
 
     <script>
-        function showPreview(uuid, fileName) {
-            document.getElementById('previewImage').src = '/images/' + encodeURIComponent(uuid) + '/' + encodeURIComponent(fileName);
+        function showPreview(folder, fileName) {
+            document.getElementById('previewImage').src = '/images/' + encodeURIComponent(folder) + '/' + encodeURIComponent(fileName);
             document.getElementById('previewOverlay').style.display = 'flex';
         }
 
