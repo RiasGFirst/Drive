@@ -1,0 +1,25 @@
+{
+  "name": "drive",
+  "version": "0.0.1",
+  "description": "Drive By RiasCloud",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RiasGFirst/Drive.git"
+  },
+  "author": "riasg.first",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RiasGFirst/Drive/issues"
+  },
+  "homepage": "https://github.com/RiasGFirst/Drive#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
