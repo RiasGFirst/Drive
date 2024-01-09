@@ -1,4 +1,5 @@
 const accountRoute = require('./api/routes/account');
+const driveRoute = require('./api/routes/drive')
 const session = require('express-session');
 const bodyParser = require('body-parser')
 const express = require('express');
@@ -18,6 +19,9 @@ app.use(session({
 }));
 
 app.use("/account", accountRoute);
+app.use("/drive", driveRoute);
+
+
 
 
 

@@ -14,9 +14,9 @@ db.connect((err) => {
       console.error('Error connecting to MySQL:', err);
       return;
     }
-    console.log('Connected to MySQL');
+    console.log('Connected to MySQL');"drivetest"
 });
-
+"drivetest"
 
 function checkExistingEmail(email, callback) {
   const sql = 'SELECT * FROM users WHERE email = ?;';
